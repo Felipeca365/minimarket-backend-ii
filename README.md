@@ -213,7 +213,7 @@ target\site\jacoco\index.html
 
 ## Evidencias sugeridas para el informe
 
-Para respaldar la ejecución del proyecto, se recomienda incluir las siguientes capturas:
+Para respaldar la ejecución del proyecto, se incluiyen las siguientes capturas:
 
 1. Ejecución final de pruebas con `65 Tests run`, `0 Failures`, `0 Errors`.
 2. Reporte JaCoCo final con `71%` de cobertura.

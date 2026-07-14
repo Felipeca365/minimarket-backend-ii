@@ -19,7 +19,7 @@ API REST desarrollada con **Spring Boot** para la gestión de un minimarket. El 
 
 ---
 
-# 🛠 Tecnologías utilizadas
+# Tecnologías utilizadas
 
 - Java 17
 - Spring Boot 3

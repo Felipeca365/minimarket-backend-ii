@@ -1,10 +1,10 @@
-# 🛒 MiniMarket API
+# MiniMarket API
 
 API REST desarrollada con **Spring Boot** para la gestión de un minimarket. El proyecto implementa documentación automática mediante **OpenAPI 3 (Swagger)**, navegación entre recursos con **Spring HATEOAS**, autenticación con **Spring Security**, pruebas unitarias con **JUnit y MockMvc** y persistencia utilizando **Spring Data JPA**.
 
 ---
 
-# 📌 Características
+# Características
 
 - Gestión de Productos
 - Gestión de Usuarios
@@ -37,7 +37,7 @@ API REST desarrollada con **Spring Boot** para la gestión de un minimarket. El 
 
 ---
 
-# 📂 Estructura del proyecto
+#  Estructura del proyecto
 
 ```
 src
@@ -57,7 +57,7 @@ src
 
 ---
 
-# 🚀 Ejecución del proyecto
+#  Ejecución del proyecto
 
 Clonar el repositorio
 
@@ -85,7 +85,7 @@ mvn spring-boot:run
 
 ---
 
-# 📖 Documentación OpenAPI
+# Documentación OpenAPI
 
 Una vez iniciada la aplicación, acceder a:
 
@@ -103,7 +103,7 @@ http://localhost:8080/v3/api-docs
 
 ---
 
-# 🔑 Autenticación
+# Autenticación
 
 La API utiliza autenticación Basic mediante Spring Security.
 
@@ -117,7 +117,7 @@ Usuarios de prueba:
 
 ---
 
-# 📦 Endpoints principales
+#  Endpoints principales
 
 ## Productos
 
@@ -159,7 +159,7 @@ Usuarios de prueba:
 
 ---
 
-# 🔗 HATEOAS
+#  HATEOAS
 
 Todos los recursos incluyen enlaces HATEOAS para facilitar la navegación entre endpoints.
 
@@ -188,7 +188,7 @@ Ejemplo:
 
 ---
 
-# 🧪 Pruebas
+#  Pruebas
 
 El proyecto incluye pruebas unitarias para:
 
@@ -209,7 +209,7 @@ BUILD SUCCESS
 
 ---
 
-# 📚 Funcionalidades implementadas
+#  Funcionalidades implementadas
 
 - CRUD de Productos
 - CRUD de Usuarios
@@ -225,12 +225,6 @@ BUILD SUCCESS
 
 ---
 
-# 👨‍💻 Autor
 
-Felipe Cáceres
-
-Analista Programador Computacional
-
-Duoc UC
 
 Proyecto desarrollado para la asignatura **Backend II**.

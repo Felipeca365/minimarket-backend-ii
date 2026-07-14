@@ -1,10 +1,13 @@
 package com.minimarket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.util.Set;
 
 @Entity
 public class Rol {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -12,10 +15,14 @@ public class Rol {
     @Column(nullable = false, unique = true)
     private String nombre;
 
+    /*
+     * Evita el ciclo:
+     * Usuario → Rol → Usuarios → Rol...
+     */
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Set<Usuario> usuarios;
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }

@@ -1,10 +1,13 @@
 package com.minimarket.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+
 import java.util.Set;
 
 @Entity
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -12,6 +15,11 @@ public class Usuario {
     @Column(nullable = false, unique = true)
     private String username;
 
+    /*
+     * Permite recibir la contraseña al crear un usuario,
+     * pero evita mostrarla en las respuestas JSON.
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String password;
 
@@ -23,7 +31,6 @@ public class Usuario {
     )
     private Set<Rol> roles;
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }

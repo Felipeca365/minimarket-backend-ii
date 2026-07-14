@@ -1,13 +1,20 @@
 package com.minimarket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
 public class DetalleVenta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /*
+     * Evita el ciclo infinito:
+     * Venta → DetalleVenta → Venta → DetalleVenta...
+     */
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)
     private Venta venta;
@@ -22,7 +29,6 @@ public class DetalleVenta {
     @Column(nullable = false)
     private Double precio;
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }

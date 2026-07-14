@@ -42,10 +42,15 @@ class VentaControllerTest {
     @DisplayName("Administrador puede listar ventas")
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     void administradorPuedeListarVentas() throws Exception {
-        when(ventaService.findAll()).thenReturn(List.of(new Venta()));
+
+        Venta venta = new Venta();
+        venta.setId(1L);
+
+        when(ventaService.findAll()).thenReturn(List.of(venta));
 
         mockMvc.perform(get("/api/ventas"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.ventaList[0].id").value(1));
 
         verify(ventaService, times(1)).findAll();
     }
@@ -54,10 +59,15 @@ class VentaControllerTest {
     @DisplayName("Cajero puede listar ventas")
     @WithMockUser(username = "cajero", authorities = {"CAJERO"})
     void cajeroPuedeListarVentas() throws Exception {
-        when(ventaService.findAll()).thenReturn(List.of(new Venta()));
+
+        Venta venta = new Venta();
+        venta.setId(1L);
+
+        when(ventaService.findAll()).thenReturn(List.of(venta));
 
         mockMvc.perform(get("/api/ventas"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.ventaList[0].id").value(1));
 
         verify(ventaService, times(1)).findAll();
     }
@@ -66,6 +76,7 @@ class VentaControllerTest {
     @DisplayName("Cliente no puede listar ventas")
     @WithMockUser(username = "cliente", authorities = {"CLIENTE"})
     void clienteNoPuedeListarVentas() throws Exception {
+
         mockMvc.perform(get("/api/ventas"))
                 .andExpect(status().isForbidden());
 
@@ -75,6 +86,7 @@ class VentaControllerTest {
     @Test
     @DisplayName("Usuario sin autenticación no puede listar ventas")
     void usuarioSinAutenticacionNoPuedeListarVentas() throws Exception {
+
         mockMvc.perform(get("/api/ventas"))
                 .andExpect(status().isUnauthorized());
 
@@ -85,6 +97,7 @@ class VentaControllerTest {
     @DisplayName("Administrador puede obtener venta por id")
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     void administradorPuedeObtenerVentaPorId() throws Exception {
+
         Venta venta = new Venta();
         venta.setId(1L);
 
@@ -92,7 +105,9 @@ class VentaControllerTest {
 
         mockMvc.perform(get("/api/ventas/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("$._links.ventas.href").exists());
 
         verify(ventaService, times(1)).findById(1L);
     }
@@ -101,6 +116,7 @@ class VentaControllerTest {
     @DisplayName("Cajero recibe 404 al consultar venta inexistente")
     @WithMockUser(username = "cajero", authorities = {"CAJERO"})
     void cajeroRecibe404AlConsultarVentaInexistente() throws Exception {
+
         when(ventaService.findById(99L)).thenReturn(null);
 
         mockMvc.perform(get("/api/ventas/99"))
@@ -113,6 +129,7 @@ class VentaControllerTest {
     @DisplayName("Cajero puede generar venta")
     @WithMockUser(username = "cajero", authorities = {"CAJERO"})
     void cajeroPuedeGenerarVenta() throws Exception {
+
         Venta venta = new Venta();
         venta.setId(1L);
 
@@ -121,8 +138,10 @@ class VentaControllerTest {
         mockMvc.perform(post("/api/ventas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(venta)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("$._links.ventas.href").exists());
 
         verify(ventaService, times(1)).save(any(Venta.class));
     }
@@ -131,6 +150,7 @@ class VentaControllerTest {
     @DisplayName("Administrador no puede generar venta si la regla exige rol cajero")
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     void administradorNoPuedeGenerarVenta() throws Exception {
+
         Venta venta = new Venta();
 
         mockMvc.perform(post("/api/ventas")
@@ -145,6 +165,7 @@ class VentaControllerTest {
     @DisplayName("Cliente no puede generar venta")
     @WithMockUser(username = "cliente", authorities = {"CLIENTE"})
     void clienteNoPuedeGenerarVenta() throws Exception {
+
         Venta venta = new Venta();
 
         mockMvc.perform(post("/api/ventas")
@@ -158,6 +179,7 @@ class VentaControllerTest {
     @Test
     @DisplayName("Usuario sin autenticación no puede generar venta")
     void usuarioSinAutenticacionNoPuedeGenerarVenta() throws Exception {
+
         Venta venta = new Venta();
 
         mockMvc.perform(post("/api/ventas")

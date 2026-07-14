@@ -52,8 +52,8 @@ class UsuarioControllerTest {
 
         mockMvc.perform(get("/api/usuarios"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].username").value("admin"));
+                .andExpect(jsonPath("$._embedded.usuarioList[0].id").value(1))
+                .andExpect(jsonPath("$._embedded.usuarioList[0].username").value("admin"));
 
         verify(usuarioService, times(1)).findAll();
     }
@@ -120,7 +120,7 @@ class UsuarioControllerTest {
         mockMvc.perform(post("/api/usuarios")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(usuario)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("nuevo_usuario"));
 

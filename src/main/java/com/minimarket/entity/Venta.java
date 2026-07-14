@@ -1,11 +1,13 @@
 package com.minimarket.entity;
 
 import jakarta.persistence.*;
+
 import java.util.Date;
 import java.util.List;
 
 @Entity
 public class Venta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,10 +19,13 @@ public class Venta {
     @Column(nullable = false)
     private Date fecha;
 
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
+    @OneToMany(
+            mappedBy = "venta",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<DetalleVenta> detalles;
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }

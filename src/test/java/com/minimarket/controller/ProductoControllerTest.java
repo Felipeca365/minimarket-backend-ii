@@ -72,7 +72,7 @@ class ProductoControllerTest {
         mockMvc.perform(post("/api/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(producto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1));
 
         verify(productoService, times(1)).save(any(Producto.class));

@@ -26,7 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // Deshabilita CSRF para facilitar pruebas con Postman y API REST
+            // Deshabilita CSRF para facilitar pruebas con Postman y Swagger
             .csrf(csrf -> csrf.disable())
 
             // Usa el servicio personalizado para cargar usuarios y roles
@@ -35,18 +35,33 @@ public class SecurityConfig {
             // Reglas de autorización
             .authorizeHttpRequests(auth -> auth
 
-                // Rutas públicas
-                .requestMatchers("/", "/login", "/logout", "/error").permitAll()
-                .requestMatchers("/public/**").permitAll()
+                // Rutas públicas generales
+                .requestMatchers(
+                    "/",
+                    "/login",
+                    "/logout",
+                    "/error",
+                    "/public/**"
+                ).permitAll()
 
-                // Usuarios: permitir registro/login por POST
-                .requestMatchers(HttpMethod.POST, "/api/usuarios/**").permitAll()
+                // Rutas públicas de OpenAPI y Swagger UI
+                .requestMatchers(
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**"
+                ).permitAll()
+
+                // Usuarios: permitir registro o creación por POST
+                .requestMatchers(HttpMethod.POST, "/api/usuarios/**")
+                    .permitAll()
 
                 // Gestión de usuarios: solo administrador
                 .requestMatchers(HttpMethod.GET, "/api/usuarios/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+
                 .requestMatchers(HttpMethod.PUT, "/api/usuarios/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+
                 .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
 
@@ -57,36 +72,54 @@ public class SecurityConfig {
                 // Productos: solo administrador puede crear, modificar o eliminar
                 .requestMatchers(HttpMethod.POST, "/api/productos/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+
                 .requestMatchers(HttpMethod.PUT, "/api/productos/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+
                 .requestMatchers(HttpMethod.DELETE, "/api/productos/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
 
-                // Categorías: consulta autenticada, modificación solo administrador
+                // Categorías: consulta autenticada
                 .requestMatchers(HttpMethod.GET, "/api/categorias/**")
                     .authenticated()
+
+                // Categorías: modificación solo administrador
                 .requestMatchers(HttpMethod.POST, "/api/categorias/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+
                 .requestMatchers(HttpMethod.PUT, "/api/categorias/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+
                 .requestMatchers(HttpMethod.DELETE, "/api/categorias/**")
                     .hasAnyAuthority("ROLE_ADMIN", "ADMIN")
 
-                // Inventario: administrador y cajero pueden gestionar movimientos
+                // Inventario: administrador y cajero
                 .requestMatchers("/api/inventario/**")
-                    .hasAnyAuthority("ROLE_ADMIN", "ADMIN", "ROLE_CAJERO", "CAJERO")
+                    .hasAnyAuthority(
+                        "ROLE_ADMIN", "ADMIN",
+                        "ROLE_CAJERO", "CAJERO"
+                    )
 
                 // Ventas: solo cajero puede generar ventas
                 .requestMatchers(HttpMethod.POST, "/api/ventas/**")
                     .hasAnyAuthority("ROLE_CAJERO", "CAJERO")
 
-                // Ventas: administrador y cajero pueden consultar ventas
+                // Ventas: administrador y cajero pueden consultar
                 .requestMatchers(HttpMethod.GET, "/api/ventas/**")
-                    .hasAnyAuthority("ROLE_ADMIN", "ADMIN", "ROLE_CAJERO", "CAJERO")
+                    .hasAnyAuthority(
+                        "ROLE_ADMIN", "ADMIN",
+                        "ROLE_CAJERO", "CAJERO"
+                    )
 
-                // Detalle de venta: administrador y cajero
-                .requestMatchers("/api/detalle-ventas/**", "/api/detalleventas/**")
-                    .hasAnyAuthority("ROLE_ADMIN", "ADMIN", "ROLE_CAJERO", "CAJERO")
+                // Detalles de venta: administrador y cajero
+                .requestMatchers(
+                    "/api/detalle-ventas/**",
+                    "/api/detalleventas/**"
+                )
+                    .hasAnyAuthority(
+                        "ROLE_ADMIN", "ADMIN",
+                        "ROLE_CAJERO", "CAJERO"
+                    )
 
                 // Carrito: cliente, cajero o administrador
                 .requestMatchers("/api/carrito/**")
@@ -100,31 +133,37 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 
-            // Permite probar con usuario y contraseña en Postman usando Basic Auth
+            // Autenticación Basic Auth para Postman y Swagger
             .httpBasic(Customizer.withDefaults())
 
-            // Mantiene login por formulario para navegador
+            // Login por formulario para navegador
             .formLogin(form -> form
                 .defaultSuccessUrl("/public/hola", true)
                 .permitAll()
             )
 
-            // Configuración de logout
+            // Configuración de cierre de sesión
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/public/hola")
                 .permitAll()
             )
 
-            // Respuestas claras para API:
-            // 401 = no autenticado
-            // 403 = autenticado pero sin permiso
+            // Respuestas claras:
+            // 401 = usuario no autenticado
+            // 403 = usuario autenticado sin permisos
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((request, response, authException) ->
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No autenticado")
+                    response.sendError(
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        "No autenticado"
+                    )
                 )
                 .accessDeniedHandler((request, response, accessDeniedException) ->
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado")
+                    response.sendError(
+                        HttpServletResponse.SC_FORBIDDEN,
+                        "Acceso denegado"
+                    )
                 )
             );
 
@@ -132,7 +171,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig) throws Exception {
+
         return authConfig.getAuthenticationManager();
     }
 

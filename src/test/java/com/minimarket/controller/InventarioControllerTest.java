@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minimarket.entity.Inventario;
 import com.minimarket.security.config.SecurityConfig;
 import com.minimarket.security.service.CustomUserDetailsService;
+import com.minimarket.security.util.JwtUtil;
 import com.minimarket.service.InventarioService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,10 @@ class InventarioControllerTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
+
+    // Nuevo: requerido porque SecurityConfig ahora usa JwtAuthenticationFilter.
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     @Test
     @DisplayName("Administrador puede listar movimientos de inventario")

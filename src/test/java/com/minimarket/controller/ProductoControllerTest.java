@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minimarket.entity.Producto;
 import com.minimarket.security.config.SecurityConfig;
 import com.minimarket.security.service.CustomUserDetailsService;
+import com.minimarket.security.util.JwtUtil;
 import com.minimarket.service.ProductoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,12 @@ class ProductoControllerTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
+
+    // Nuevo: SecurityConfig ahora requiere JwtAuthenticationFilter, que a su
+    // vez depende de JwtUtil. En un WebMvcTest hay que mockearlo para que
+    // el contexto de la prueba pueda construirse.
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     @Test
     @DisplayName("Usuario autenticado puede listar productos")

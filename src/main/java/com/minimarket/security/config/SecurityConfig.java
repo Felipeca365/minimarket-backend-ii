@@ -1,25 +1,31 @@
 package com.minimarket.security.config;
 
+import com.minimarket.security.filter.JwtAuthenticationFilter;
 import com.minimarket.security.service.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
+    public SecurityConfig(
+            CustomUserDetailsService customUserDetailsService,
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.customUserDetailsService = customUserDetailsService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -32,17 +38,23 @@ public class SecurityConfig {
             // Usa el servicio personalizado para cargar usuarios y roles
             .userDetailsService(customUserDetailsService)
 
+            // JWT es stateless: el servidor no guarda sesión, cada
+            // petición se autentica de nuevo a partir del token.
+            .sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
             // Reglas de autorización
             .authorizeHttpRequests(auth -> auth
 
                 // Rutas públicas generales
                 .requestMatchers(
                     "/",
-                    "/login",
-                    "/logout",
                     "/error",
                     "/public/**"
                 ).permitAll()
+
+                // Login: genera el token, debe ser accesible sin autenticación
+                .requestMatchers("/api/auth/**").permitAll()
 
                 // Rutas públicas de OpenAPI y Swagger UI
                 .requestMatchers(
@@ -133,21 +145,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 
-            // Autenticación Basic Auth para Postman y Swagger
-            .httpBasic(Customizer.withDefaults())
-
-            // Login por formulario para navegador
-            .formLogin(form -> form
-                .defaultSuccessUrl("/public/hola", true)
-                .permitAll()
-            )
-
-            // Configuración de cierre de sesión
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/public/hola")
-                .permitAll()
-            )
+            // Inserta el filtro JWT antes del filtro estándar de
+            // usuario/contraseña, para que el token se procese primero
+            .addFilterBefore(
+                    jwtAuthenticationFilter,
+                    UsernamePasswordAuthenticationFilter.class)
 
             // Respuestas claras:
             // 401 = usuario no autenticado

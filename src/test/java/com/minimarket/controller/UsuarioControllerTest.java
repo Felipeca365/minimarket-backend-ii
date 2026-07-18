@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minimarket.entity.Usuario;
 import com.minimarket.security.config.SecurityConfig;
 import com.minimarket.security.service.CustomUserDetailsService;
+import com.minimarket.security.util.JwtUtil;
 import com.minimarket.service.UsuarioService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,10 @@ class UsuarioControllerTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
+
+    // Nuevo: requerido porque SecurityConfig ahora usa JwtAuthenticationFilter.
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     @Test
     @DisplayName("Administrador puede listar usuarios")
